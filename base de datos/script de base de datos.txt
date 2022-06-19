@@ -1,0 +1,136 @@
+drop database if exists website;
+create database website;
+use website;
+
+#paciente(#id,nombre,apellido,mail,codigo,fecha_nacimiento,num_cuenta,dni,psicologo_acargo,tlf_paciente)
+create table paciente(
+id int unsigned primary key auto_increment,
+nombre varchar (20) not null,
+apellido varchar (20) not null,
+mail varchar (20),
+fecha_nacimiento date,
+num_cuenta float,
+dni char(15) not null,
+psicologo_acargo varchar (20) not null,
+tlf_paciente varchar (10)not null
+);
+
+#tlf(#id,tlf_paciente,-id_paciente,-id_telefono_paciente)
+create table tlf_paciente(
+id int unsigned primary key auto_increment,
+tlf_paciente varchar (10),
+id_paciente int unsigned,
+foreign key (id_paciente) references paciente(id)
+);
+
+#psicologo(#id,especializacion,nombre,apellido,dni,referencias,lugar_residencia,mail,numero_colegiado,tlf_psicologo)
+create table psicologo(
+id int unsigned primary key auto_increment,
+especializacion varchar (40),
+nombre varchar (20),
+apellido varchar (20),
+dni char(15),
+referencias varchar (100),
+lugar_residencia varchar (50),
+mail varchar (15),
+numero_colegiado float,
+tlf_psicologo varchar (15)
+);
+
+#secretaria(#id,nombre,apellido,num_seguridad_social,dni,tlf_secretaria,-id_psicologo)
+create table secretaria(
+id int unsigned primary key auto_increment,
+nombre varchar (20),
+apellido varchar (20),
+num_seguridad_social varchar (15),
+dni char (10),
+id_psicologo int unsigned,
+tlf_secretaria varchar (15),
+foreign key (id_psicologo) references psicologo (id)
+);
+
+#tlf(#id,tlf_secretaria)
+create table tlf_secretaria(
+id int unsigned primary key auto_increment,
+tlf_secretaria varchar (10),
+id_secretaria int unsigned,
+foreign key (id_secretaria) references secretaria(id)
+);
+
+#cita(#id,fecha_inicio,hora,codigo,tipo_plataforma,-id_psicologo,-id_paciente)
+create table cita(
+id int unsigned primary key auto_increment,
+fecha_inicio date,
+hora time,
+codigo char(8),
+tipo_plataforma enum('microsoft','meet','zoom','discord'),
+id_psicologo int unsigned,
+foreign key (id_psicologo) references psicologo(id),
+id_paciente int unsigned,
+foreign key (id_paciente) references paciente(id)
+);
+
+#cita_psicologo(#(-id_cita,-id_psicologo))
+create table cita_psicologo(
+id_cita int unsigned,
+id_psicologo int unsigned,
+foreign key (id_cita) references cita (id),
+foreign key (id_psicologo) references psicologo (id)
+);
+
+#cita_paciente(#(-id_cita,-id_paciente))
+create table cita_paciente(
+id_cita int unsigned,
+id_psicologo int unsigned,
+foreign key (id_cita) references cita (id),
+foreign key (id_psicologo) references psicologo (id)
+);
+
+
+
+#tfl(#id,tlf_psicologo,-id_psicologo,-id_tlf_psicologo)
+create table tlf_psicologo(
+id int unsigned primary key auto_increment,
+tlf_psicologo varchar (15),
+id_psicologo int unsigned,
+foreign key (id_psicologo) references psicologo (id)
+);
+
+#tarifa(#id,tiempo_inicio,tiempo_final,total_horas,total_pago,-id_psicologo)
+create table tarifa(
+id int unsigned primary key auto_increment,
+tiempo_inicio time,
+tiempo_final time,
+total_horas time,
+total_pago float,
+id_psicologo int unsigned,
+foreign key (id_psicologo) references psicologo (id)
+);
+
+#tarifa_psicologo(#(-id_tarifa,-id_psicologo))
+create table tarifa_psicologo(
+id_tarifa int unsigned,
+foreign key(id_tarifa) references tarifa (id),
+id_psicologo int unsigned,
+foreign key (id_psicologo) references psicologo (id)
+);
+
+#registro(#id,fecha_inicio,fecha_final,transtorno_paciente,codigo_paciente,motivo_consulta,-id_psicologo)
+create table registro(
+id int unsigned primary key auto_increment,
+fecha_inicio date not null,
+fecha_final date not null,
+transtorno_paciente varchar (50) not null,
+codigo_paciente float,
+motivo_consulta varchar (50),
+id_psicologo int unsigned,
+foreign key (id_psicologo) references psicologo (id)
+);
+
+#registro_psicologo(#(-id_registro,-id_psicologo))
+create table registro_psicologo(
+id_registro int unsigned,
+foreign key (id_registro) references registro (id),
+id_psicologo int unsigned,
+foreign key (id_psicologo) references psicologo (id)
+);
